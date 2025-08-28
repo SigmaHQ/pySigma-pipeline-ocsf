@@ -2,6 +2,7 @@
 name = "pySigma-pipeline-ocsf"
 version = "0.1.0"
 description = "pySigma OCSF pipeline"
+readme = "README.md"
 authors = ["Hendrik Baecker <hb@process-zero.de>"]
 license = "MIT"
 repository = "https://github.com/SigmaHQ/pySigma-pipeline-ocsf"
@@ -11,11 +12,10 @@ packages = [
 
 [tool.poetry.dependencies]
 python = ">=3.9,<4.0"
-pysigma = "^0.11.0"
+pysigma = {git = "https://github.com/SigmaHQ/pySigma.git"}
 
-
-[tool.poetry.dev-dependencies]
-defusedxml = "^0.7"
+[tool.poetry.group.dev.dependencies]
+defusedxml = "^0.7.1"
 pytest = ">=7.3,<9.0"
 pytest-cov = ">=4,<7"
 
