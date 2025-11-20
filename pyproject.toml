@@ -1,18 +1,25 @@
-[tool.poetry]
+[project]
 name = "pySigma-pipeline-ocsf"
 version = "0.1.1"
 description = "pySigma OCSF pipeline"
 readme = "README.md"
-authors = ["Hendrik Baecker <hb@process-zero.de>"]
+authors = [
+    {name = "Hendrik Baecker",email = "hendrik.baecker@dcso.de"}
+]
 license = "MIT"
 repository = "https://github.com/SigmaHQ/pySigma-pipeline-ocsf"
+dependencies = [
+	"pysigma @ git+https://github.com/SigmaHQ/pySigma.git@v1.0.0rc2"
+]
+requires-python = "^3.10"
+
+[tool.poetry]
 packages = [
     { include = "sigma" }
 ]
 
 [tool.poetry.dependencies]
-python = ">=3.9,<4.0"
-pysigma = "^0.11.23"
+pysigma = ">=0.11.23,<2.0.0"
 
 [tool.poetry.group.dev.dependencies]
 defusedxml = "^0.7.1"
