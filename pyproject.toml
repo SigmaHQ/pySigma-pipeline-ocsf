@@ -9,9 +9,8 @@ authors = [
 license = "MIT"
 repository = "https://github.com/SigmaHQ/pySigma-pipeline-ocsf"
 dependencies = [
-	"pysigma @ git+https://github.com/SigmaHQ/pySigma.git@v1.0.0rc2"
+    "pysigma (>=1.0.0,<2.0.0)"
 ]
-requires-python = "^3.10"
 
 [tool.poetry]
 packages = [
@@ -19,6 +18,7 @@ packages = [
 ]
 
 [tool.poetry.dependencies]
+python = "^3.10"
 pysigma = ">=0.11.23,<2.0.0"
 
 [tool.poetry.group.dev.dependencies]
