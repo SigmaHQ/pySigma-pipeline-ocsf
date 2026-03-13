@@ -167,5 +167,5 @@ def test_ocsf_ps_script(backend, ps_script_sigma_rule):
 
 def test_ocsf_ps_module(backend, ps_module_sigma_rule):
     assert backend.convert(ps_module_sigma_rule) == [
-        'type_uid=100901 and unmapped.ContextInfo="Test" and unmapped.Payload="Test"'
+        'type_uid=100901 and unmapped.context_info="Test" and script.script_content="Test"'
     ]
