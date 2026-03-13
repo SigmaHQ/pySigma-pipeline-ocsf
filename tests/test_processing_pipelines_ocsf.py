@@ -81,6 +81,7 @@ def test_ocsf_file_rename(backend, file_rename_detected_sigma_rule):
         'class_uid=1001 and category_uid=1 and activity_id=5 and file.name="test.exe" and file_result.file.name="test-new.exe"'
     ]
 
+
 # ToDo Check here
 def test_ocsf_image_load(backend, image_load_sigma_rule):
     assert backend.convert(image_load_sigma_rule) == [
@@ -155,4 +156,16 @@ def test_ocsf_registry_set(backend, registry_set_sigma_rule):
 def test_ocsf_sysmon_error(backend, sysmon_error_sigma_rule):
     assert backend.convert(sysmon_error_sigma_rule) == [
         'class_uid=6008 and category_uid=6 and activity_id=1 and message="a error is here"'
+    ]
+
+
+def test_ocsf_ps_script(backend, ps_script_sigma_rule):
+    assert backend.convert(ps_script_sigma_rule) == [
+        'type_uid=100901 and script.script_content="Test" and script.file.path="Test"'
+    ]
+
+
+def test_ocsf_ps_module(backend, ps_module_sigma_rule):
+    assert backend.convert(ps_module_sigma_rule) == [
+        'type_uid=100901 and unmapped.context_info="Test" and script.script_content="Test"'
     ]

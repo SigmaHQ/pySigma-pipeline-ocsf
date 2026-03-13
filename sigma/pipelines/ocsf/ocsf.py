@@ -99,6 +99,8 @@ ocsf_generic_logsource_category_mapping = {  # map generic Sigma log source cate
         "category_uid": 6,
         "activity_id": 1,
     },
+    "ps_script": {"type_uid": 100901},
+    "ps_module": {"type_uid": 100901},
     # "sysmon_status": [4, 16],
     # "wmi_event": [19, 20, 21],
 }
@@ -790,6 +792,34 @@ def ocsf_pipeline() -> ProcessingPipeline:
                 rule_conditions=[
                     LogsourceCondition(product="windows"),
                     LogsourceCondition(service="system"),
+                ],
+            )
+        ]
+        + [
+            ProcessingItem(  # Field mappings for windows system)
+                identifier="ocsf_field_mappings_windows_system",
+                transformation=FieldMappingTransformation(
+                    {
+                        "ScriptBlockText": "script.script_content",
+                        "Path": "script.file.path",
+                    }
+                ),
+                rule_conditions=[
+                    LogsourceCondition(category="ps_script"),
+                ],
+            )
+        ]
+        + [
+            ProcessingItem(  # Field mappings for windows system)
+                identifier="ocsf_field_mappings_windows_system",
+                transformation=FieldMappingTransformation(
+                    {
+                        "Payload": "script.script_content",
+                        "ContextInfo": "unmapped.context_info",
+                    }
+                ),
+                rule_conditions=[
+                    LogsourceCondition(category="ps_module"),
                 ],
             )
         ]
