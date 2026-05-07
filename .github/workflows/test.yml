@@ -24,6 +24,8 @@ jobs:
           cache: poetry
       - name: Install dependencies
         run: poetry install
+      - name: Install black
+        run: poetry add --dev black
       - name: Lint with black
         run: poetry run black --check .
       - name: Run tests
