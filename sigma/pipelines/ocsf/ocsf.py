@@ -13,7 +13,6 @@ from sigma.processing.conditions import (
 )
 from sigma.processing.pipeline import ProcessingItem, ProcessingPipeline
 
-
 # Contains windows mappings in form of:
 # {product: {service: {eventid: {field: value}}}}
 ocsf_windows_eventid_mapping = {
