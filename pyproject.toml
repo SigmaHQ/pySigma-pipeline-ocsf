@@ -11,6 +11,7 @@ repository = "https://github.com/SigmaHQ/pySigma-pipeline-ocsf"
 dependencies = [
     "pysigma (>=1.0.0,<2.0.0)"
 ]
+requires-python = "^3.10"
 
 [tool.poetry]
 packages = [
