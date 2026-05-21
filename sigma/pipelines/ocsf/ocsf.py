@@ -78,6 +78,7 @@ ocsf_generic_logsource_category_mapping = {  # map generic Sigma log source cate
     "ps_module": {"type_uid": 100901},
     # "sysmon_status": [4, 16],
     # "wmi_event": [19, 20, 21],
+    "proxy": {"class_name": "HTTP Activity"},
 }
 
 
@@ -796,6 +797,25 @@ def ocsf_pipeline() -> ProcessingPipeline:
                 rule_conditions=[
                     LogsourceCondition(category="ps_module"),
                 ],
+            )
+        ]
+        + [
+            ProcessingItem(  # Field mappings for logsource proxy)
+                identifier="ocsf_field_mappings_logsource_proxy",
+                transformation=FieldMappingTransformation(
+                    {
+                        "c-uri-extension": "http_request.url.path",
+                        "c-uri-query": "http_request.url.query_string",
+                        "c-uri": "http_request.url.url_string",
+                        "c-useragent": "http_request.user_agent",
+                        "cs-cookie": "http_cookies",
+                        "cs-host": "http_request.url.hostname",
+                        "cs-method": "http_request.http_method",
+                        "cs-uri": "http_request.url.url_string",
+                        "dst_ip": "dst_endpoint.ip",
+                    }
+                ),
+                rule_conditions=[LogsourceCondition(category="proxy")],
             )
         ]
         # Convert EventID aka metadata.event_code to str
