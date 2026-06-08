@@ -91,7 +91,10 @@ def test_ocsf_image_load(backend, image_load_sigma_rule):
 
 def test_ocsf_network_connect(backend, network_connection_sigma_rule):
     assert backend.convert(network_connection_sigma_rule) == [
-        'class_uid=4001 and Initiated="true" and dst_endpoint.ip="1.2.3.4"'
+        'class_uid=4001 and unmapped.Initiated="true" and dst_endpoint.ip="1.2.3.4" '
+        'and connection_info.protocol_name="tcp" and actor.process.file.name="test.exe" '
+        'and actor.process.parent_process.file.name="parent.exe" '
+        'and actor.process.cmd_line="test.exe foo bar" and unmapped.SourceIsIpv6="false"'
     ]
 
 

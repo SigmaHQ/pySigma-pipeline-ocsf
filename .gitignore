@@ -5,3 +5,5 @@
 cov.xml
 dist/
 docs/_build
+# Local virtualenvs (Poetry in-project) — never commit
+.venv/

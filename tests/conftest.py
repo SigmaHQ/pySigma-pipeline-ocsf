@@ -277,6 +277,11 @@ def network_connection_sigma_rule():
             sel:
                Initiated: "true"
                DestinationIp: "1.2.3.4"
+               Protocol: "tcp"
+               Image: "test.exe"
+               ParentImage: "parent.exe"
+               CommandLine: "test.exe foo bar"
+               SourceIsIpv6: "false"
             condition: sel
     """)
 
