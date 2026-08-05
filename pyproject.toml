@@ -19,7 +19,7 @@ packages = [
 ]
 
 [tool.poetry.dependencies]
-pysigma = ">=1.4.0,<2.0.0"
+pysigma = ">=1.5.0,<2.0.0"
 
 [tool.poetry.group.dev.dependencies]
 defusedxml = "^0.7.1"
