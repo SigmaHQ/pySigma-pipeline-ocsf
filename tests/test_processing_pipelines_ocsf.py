@@ -48,31 +48,31 @@ def test_ocsf_firewall(backend, firewall_sigma_rule):
 
 def test_ocsf_file_access(backend, file_access_sigma_rule):
     assert backend.convert(file_access_sigma_rule) == [
-        'type_uid=100114 and file.name contains-all ("Test", "test.exe")'
+        'type_uid=100114 and file.path contains-all ("Test", "test.exe")'
     ]
 
 
 def test_ocsf_file_change(backend, file_change_sigma_rule):
     assert backend.convert(file_change_sigma_rule) == [
-        'type_uid=100103 and file.name="test"'
+        'type_uid=100103 and file.path="test"'
     ]
 
 
 def test_ocsf_file_delete(backend, file_delete_sigma_rule):
     assert backend.convert(file_delete_sigma_rule) == [
-        'type_uid=100104 and actor.user.name="test" and file.name="test" and file.name="test"'
+        'type_uid=100104 and actor.user.name="test" and file.path="test" and file.path="test"'
     ]
 
 
 def test_ocsf_file_event(backend, file_event_sigma_rule):
     assert backend.convert(file_event_sigma_rule) == [
-        'type_uid=100101 and file.name="test.exe" and process.cmd_line="test.exe /foo /bar"'
+        'type_uid=100101 and file.path="test.exe" and process.cmd_line="test.exe /foo /bar"'
     ]
 
 
 def test_ocsf_file_executable_detected(backend, file_executable_detected_sigma_rule):
     assert backend.convert(file_executable_detected_sigma_rule) == [
-        'type_uid=100101 and file.name="test.exe"'
+        'type_uid=100101 and file.path="test.exe"'
     ]
 
 
@@ -85,7 +85,7 @@ def test_ocsf_file_rename(backend, file_rename_detected_sigma_rule):
 # ToDo Check here
 def test_ocsf_image_load(backend, image_load_sigma_rule):
     assert backend.convert(image_load_sigma_rule) == [
-        'type_uid=100799 and activity_name="Load" and process.file.name="test.exe"'
+        'type_uid=100799 and activity_name="Load" and process.file.path="test.exe"'
     ]
 
 
@@ -93,37 +93,37 @@ def test_ocsf_network_connect(backend, network_connection_sigma_rule):
     assert backend.convert(network_connection_sigma_rule) == [
         'class_uid=4001 and unmapped.Initiated="true" and dst_endpoint.ip="1.2.3.4" '
         'and connection_info.protocol_name="tcp" and actor.process.file.name="test.exe" '
-        'and actor.process.parent_process.file.name="parent.exe" '
+        'and actor.process.parent_process.file.path="parent.exe" '
         'and actor.process.cmd_line="test.exe foo bar" and unmapped.SourceIsIpv6="false"'
     ]
 
 
 def test_ocsf_process_access(backend, process_access_sigma_rule):
     assert backend.convert(process_access_sigma_rule) == [
-        'type_uid=100799 and activity_name="Access" and process.name="test.exe"'
+        'type_uid=100799 and activity_name="Access" and process.path="test.exe"'
     ]
 
 
 def test_ocsf_process_creation(backend, process_creation_sigma_rule):
     assert backend.convert(process_creation_sigma_rule) == [
-        'type_uid=100701 and process.cmd_line="test.exe foo bar" and process.name endswith "\\test.exe"'
+        'type_uid=100701 and process.cmd_line="test.exe foo bar" and process.path endswith "\\test.exe"'
     ]
 
 
 def test_ocsf_process_tampering(backend, process_tampering_sigma_rule):
     assert backend.convert(process_tampering_sigma_rule) == [
-        'type_uid=100704 and process.name="test.exe"'
+        'type_uid=100704 and process.path="test.exe"'
     ]
 
 
 def test_ocsf_process_termination(backend, process_termination_sigma_rule):
     assert backend.convert(process_termination_sigma_rule) == [
-        'type_uid=100702 and process.name="test.exe"'
+        'type_uid=100702 and process.path="test.exe"'
     ]
 
 
 def test_ocsf_raw_access_thread(backend, raw_access_thread_sigma_rule):
-    assert backend.convert(raw_access_thread_sigma_rule) == ['Image="test.exe"']
+    assert backend.convert(raw_access_thread_sigma_rule) == ['process.path="test.exe"']
 
 
 def test_ocsf_registry_add(backend, registry_add_sigma_rule):
