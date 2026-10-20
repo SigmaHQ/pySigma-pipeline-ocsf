@@ -10,6 +10,7 @@ Currently the pipeline adds support for the following event types (Sigma logsour
 
 * application
 * antivirus
+* create_remote_thread
 * create_stream_hash
 * dns
 * dns_query
@@ -27,12 +28,14 @@ Currently the pipeline adds support for the following event types (Sigma logsour
 * process_creation
 * process_tampering
 * process_termination
+* proxy
 * registry_add
 * registry_delete
 * registry_event
 * registry_rename
 * registry_set
 * sysmon_error
+* webserver
 
 This pipeline is currently maintained by:
 
