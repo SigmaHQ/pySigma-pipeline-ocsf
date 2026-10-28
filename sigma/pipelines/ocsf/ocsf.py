@@ -54,7 +54,7 @@ ocsf_generic_logsource_category_mapping = {  # map generic Sigma log source cate
         "type_uid": 100799,
         "activity_name": "Load",
     },
-    "network_connection": {"class_uid": 4001},
+    "network_connection": {"type_uid": 400101},
     # "pipe_created": [17, 18],
     "process_access": {
         "type_uid": 100799,
