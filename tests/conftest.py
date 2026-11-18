@@ -117,6 +117,7 @@ def dns_query_sigma_rule():
         detection:
             sel:
                 QueryName: gist.github.com
+                Image: test.exe
             condition: sel
     """)
 
@@ -214,6 +215,8 @@ def file_event_sigma_rule():
         detection:
             sel:
                 TargetFilename: test.exe
+                Image: '*\\\\powershell.exe'
+                ParentImage: '*\\\\explorer.exe'
                 CommandLine: test.exe /foo /bar
             condition: sel
     """)
@@ -260,7 +263,11 @@ def image_load_sigma_rule():
             product: windows
         detection:
             sel:
-                ImageLoaded: test.exe
+                Image: test.exe
+                ImageLoaded: test.dll
+                Signed: 'false'
+                Hashes|contains: 'MD5=AABB'
+                OriginalFileName: test.dll
             condition: sel
     """)
 
@@ -312,7 +319,9 @@ def process_access_sigma_rule():
             product: windows
         detection:
             sel:
+                SourceImage: source.exe
                 TargetImage: test.exe
+                GrantedAccess: '0x1010'
             condition: sel
     """)
 
@@ -329,6 +338,8 @@ def process_creation_sigma_rule():
             sel:
                 CommandLine: "test.exe foo bar"
                 Image: "*\\\\test.exe"
+                Hashes|contains: 'IMPHASH=8C8B6E5D'
+                IntegrityLevel: High
             condition: sel
     """)
 
@@ -376,11 +387,12 @@ def proxy_sigma_rule():
                 dst_ip: 1.1.1.1
                 cs-uri: /test/test.exe
                 cs-method: GET
-                c-uri-extension: test-extension
+                c-uri-extension: exe
                 cs-host: github.com
                 c-uri: /test/test.exe
                 cs-cookie: Test-Cookie
                 c-uri-query: ?test=test
+                sc-status: 200
             condition: sel
     """)
 
@@ -498,6 +510,7 @@ def registry_event_sigma_rule():
             product: windows
         detection:
             sel:
+                TargetObject: HKLM\\Software\\Test
                 Image: test.exe
             condition: sel
     """)
@@ -529,6 +542,7 @@ def registry_set_sigma_rule():
         detection:
             sel:
                 TargetObject: test.exe
+                Details: DWORD (0x00000001)
             condition: sel
     """)
 
@@ -578,6 +592,10 @@ def webserver_sigma_rule():
                 sc-status: Test
                 cs-user-agent: Test-UA
                 cs-referer: Test-Referer
+                cs-uri-stem: /test/upload.aspx
+                cs-host: example.com
+                cs-username: anonymous
+                cs-content-type: application/octet-stream
             condition: sel
     """)
 
