@@ -30,20 +30,32 @@ ocsf_windows_eventid_mapping = {
 
 ocsf_generic_logsource_category_mapping = {  # map generic Sigma log source categories to OCSF Categories and Activities
     "application": {
-        "class_uid": 6002,
+        # "class_uid": 6002,
+        "class_name": "Application Lifecycle",
         "category_uid": 6,
     },
     "antivirus": {
-        "class_uid": 2004,
+        # "class_uid": 2004,
+        "class_name": "Detection Finding",
         "category_uid": 2,
     },
     # "clipboard_capture": 24,
     # "create_remote_thread": 8,
+    "create_remote_thread": {"type_uid": 100704},
     "create_stream_hash": {"type_uid": 100103},
-    "dns": {"class_uid": 4003},
-    "dns_query": {"class_uid": 4003},
-    "driver_load": {"type_uid": 100702},
-    "firewall": {"class_uid": 4001},
+    "dns": {
+        # "class_uid": 4003,
+        "class_name": "DNS Activity",
+    },
+    "dns_query": {
+        # "class_uid": 4003,
+        "class_name": "DNS Activity",
+    },
+    "driver_load": {"type_uid": 100201},
+    "firewall": {
+        # "class_uid": 4001,
+        "class_name": "Network Activity",
+    },
     "file_access": {"type_uid": 100114},
     "file_change": {"type_uid": 100103},
     "file_delete": {"type_uid": 100104},
@@ -51,25 +63,21 @@ ocsf_generic_logsource_category_mapping = {  # map generic Sigma log source cate
     "file_executable_detected": {"type_uid": 100101},
     "file_rename": {"type_uid": 100105},
     "image_load": {
-        "type_uid": 100799,
-        "activity_name": "Load",
-    },
+        # "class_uid": 1007,
+        "class_name": "Process Activity",
+    },  # module loads are recognized by module.file.path, see below
     "network_connection": {"type_uid": 400101},
     # "pipe_created": [17, 18],
-    "process_access": {
-        "type_uid": 100799,
-        "activity_name": "Access",
-    },
+    "process_access": {"type_uid": 100703},
     "process_creation": {"type_uid": 100701},
-    "process_tampering": {
-        "type_uid": 100704,
-    },
+    "process_tampering": {"type_uid": 100704},
     "process_termination": {"type_uid": 100702},
     # "raw_access_thread": 9,
     "registry_add": {"type_uid": 20100101},
     "registry_delete": {"type_uid": 20100104},
     "registry_event": {
-        "class_uid": 201001,
+        # "class_uid": 201001,
+        "class_name": "Registry Key Activity",
     },
     "registry_rename": {"type_uid": 20100105},
     "registry_set": {"type_uid": 20100202},
@@ -79,6 +87,7 @@ ocsf_generic_logsource_category_mapping = {  # map generic Sigma log source cate
     # "sysmon_status": [4, 16],
     # "wmi_event": [19, 20, 21],
     "proxy": {"class_name": "HTTP Activity"},
+    "webserver": {"class_name": "HTTP Activity"},
 }
 
 
@@ -89,6 +98,15 @@ def ocsf_pipeline() -> ProcessingPipeline:
         allowed_backends=frozenset(),  # Set of identifiers of backends (from the backends mapping) that are allowed to use this processing pipeline. This can be used by frontends like Sigma CLI to warn the user about inappropriate usage.
         priority=20,  # The priority defines the order pipelines are applied. See documentation for common values.
         items=[
+            ProcessingItem(  # Process Activity has no module load activity: require a loaded module
+                identifier="ocsf_image_load_module_file_path",
+                transformation=AddConditionTransformation(
+                    {"module.file.path": None}, negated=True
+                ),
+                rule_conditions=[LogsourceCondition(category="image_load")],
+            )
+        ]
+        + [
             ProcessingItem(
                 identifier=f"ocsf_{log_source}_{field}",
                 transformation=AddConditionTransformation(
