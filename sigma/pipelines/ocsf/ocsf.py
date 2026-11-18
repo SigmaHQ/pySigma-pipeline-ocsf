@@ -3,6 +3,7 @@ from sigma.processing.transformations import (
     AddConditionTransformation,
     FieldMappingTransformation,
     ConvertTypeTransformation,
+    ReplaceStringTransformation,
 )
 
 from sigma.processing.conditions import (
@@ -143,6 +144,27 @@ def ocsf_pipeline() -> ProcessingPipeline:
             for field, value in sorted(mappeddata.items())
         ]
         # Field mappings for categories
+        + [
+            ProcessingItem(  # Sysmon hash lists are "ALG=value,...", OCSF hashes[].value holds bare values
+                identifier="ocsf_value_hashes_strip_algorithm",
+                transformation=ReplaceStringTransformation(
+                    r"(?i)\b(?:MD5|SHA1|SHA256|SHA384|SHA512|IMPHASH)=", ""
+                ),
+                rule_conditions=[
+                    LogsourceCondition(category=category)
+                    for category in (
+                        "create_stream_hash",
+                        "driver_load",
+                        "image_load",
+                        "process_creation",
+                    )
+                ],
+                rule_condition_linking=any,
+                field_name_conditions=[
+                    IncludeFieldCondition(fields=["Hashes", "Hash"])
+                ],
+            )
+        ]
         + [
             ProcessingItem(  # Field mappings for application)
                 identifier="ocsf_field_mappings_application",
