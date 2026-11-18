@@ -204,14 +204,14 @@ def ocsf_pipeline() -> ProcessingPipeline:
                 identifier="ocsf_field_mappings_create_remote_thread",
                 transformation=FieldMappingTransformation(
                     {
-                        "SourceParentImage": "file_result.name",
-                        "SourceImage": "file.name",
-                        "TargetParentProcessId": "unmapped.TargetParentProcessId",
-                        "StartFunction": "unmapped.StartFunction",
-                        "StartAddress": "unmapped.StartAddress",
-                        "SourceCommandLine": "unmapped.SourceCommandLine",
-                        "StartModule": "unmapped.StartModule",
-                        "TargetImage": "file_result.name",
+                        "SourceImage": "actor.process.file.path",
+                        "SourceParentImage": "actor.process.parent_process.file.path",
+                        "SourceCommandLine": "actor.process.cmd_line",
+                        "TargetImage": "process.file.path",
+                        "TargetParentProcessId": "process.parent_process.pid",
+                        "StartModule": "module.file.path",
+                        "StartFunction": "module.function_name",
+                        "StartAddress": "module.start_address",
                     }
                 ),
                 rule_conditions=[LogsourceCondition(category="create_remote_thread")],
@@ -223,9 +223,9 @@ def ocsf_pipeline() -> ProcessingPipeline:
                 transformation=FieldMappingTransformation(
                     {
                         "Hash": "file.hashes.value",
-                        "Image": "file.name",
+                        "Image": "actor.process.file.path",
                         "Contents": "unmapped.Contents",
-                        "TargetFilename": "file.name",
+                        "TargetFilename": "file.path",
                     }
                 ),
                 rule_conditions=[LogsourceCondition(category="create_stream_hash")],
@@ -236,7 +236,7 @@ def ocsf_pipeline() -> ProcessingPipeline:
                 identifier="ocsf_field_mappings_dns",
                 transformation=FieldMappingTransformation(
                     {
-                        "answer": "answer.rdata",
+                        "answer": "answers.rdata",
                         "record_type": "query.type",
                         "query": "query.hostname",
                     }
@@ -261,8 +261,11 @@ def ocsf_pipeline() -> ProcessingPipeline:
                 identifier="ocsf_field_mappings_driver_load",
                 transformation=FieldMappingTransformation(
                     {
-                        "Hashes": "process.file.hashes.value",
-                        "ImageLoaded": "process.file.name",
+                        "Hashes": "driver.file.hashes.value",
+                        "ImageLoaded": "driver.file.path",
+                        "Signed": "unmapped.Signed",
+                        "Signature": "driver.file.signature.certificate.subject",
+                        "SignatureStatus": "driver.file.signature.state",
                     }
                 ),
                 rule_conditions=[LogsourceCondition(category="driver_load")],
@@ -273,6 +276,8 @@ def ocsf_pipeline() -> ProcessingPipeline:
                 identifier="ocsf_field_mappings_firewall",
                 transformation=FieldMappingTransformation(
                     {
+                        "src_ip": "src_endpoint.ip",
+                        "dst_ip": "dst_endpoint.ip",
                         "action": "unmapped.action",
                         "blocked": "unmapped.blocked",
                         "dst_port": "dst_endpoint.port",
@@ -286,8 +291,9 @@ def ocsf_pipeline() -> ProcessingPipeline:
                 identifier="ocsf_field_mappings_file_access",
                 transformation=FieldMappingTransformation(
                     {
-                        "Image": "file.name",
-                        "FileName": "file.name",
+                        "ParentImage": "actor.process.parent_process.file.path",
+                        "Image": "actor.process.file.path",
+                        "FileName": "file.path",
                     }
                 ),
                 rule_conditions=[LogsourceCondition(category="file_access")],
@@ -299,9 +305,9 @@ def ocsf_pipeline() -> ProcessingPipeline:
                 transformation=FieldMappingTransformation(
                     {
                         "CreationUtcTime": "file.created_time",
-                        "Image": "file.name",
+                        "Image": "actor.process.file.path",
                         "PreviousCreationUtcTime": "unmapped.PreviousCreationUtcTime",
-                        "TargetFilename": "file.name",
+                        "TargetFilename": "file.path",
                     }
                 ),
                 rule_conditions=[LogsourceCondition(category="file_change")],
@@ -313,8 +319,8 @@ def ocsf_pipeline() -> ProcessingPipeline:
                 transformation=FieldMappingTransformation(
                     {
                         "User": "actor.user.name",
-                        "Image": "file.name",
-                        "TargetFilename": "file.name",
+                        "Image": "actor.process.file.path",
+                        "TargetFilename": "file.path",
                     }
                 ),
                 rule_conditions=[LogsourceCondition(category="file_delete")],
@@ -325,11 +331,14 @@ def ocsf_pipeline() -> ProcessingPipeline:
                 identifier="ocsf_field_mappings_file_event",
                 transformation=FieldMappingTransformation(
                     {
-                        "ParentCommandLine": "process.parent_process.cmd_line",
-                        "ParentImage": "file.name",
-                        "CommandLine": "process.cmd_line",
-                        "Image": "file.name",
-                        "TargetFilename": "file.name",
+                        "IntegrityLevel": "actor.process.integrity",
+                        "CreationUtcTime": "file.created_time",
+                        "User": "actor.user.name",
+                        "ParentCommandLine": "actor.process.parent_process.cmd_line",
+                        "ParentImage": "actor.process.parent_process.file.path",
+                        "CommandLine": "actor.process.cmd_line",
+                        "Image": "actor.process.file.path",
+                        "TargetFilename": "file.path",
                     }
                 ),
                 rule_conditions=[LogsourceCondition(category="file_event")],
@@ -340,7 +349,7 @@ def ocsf_pipeline() -> ProcessingPipeline:
                 identifier="ocsf_field_mappings_file_executable_detected",
                 transformation=FieldMappingTransformation(
                     {
-                        "TargetFilename": "file.name",
+                        "TargetFilename": "file.path",
                     }
                 ),
                 rule_conditions=[
@@ -353,8 +362,9 @@ def ocsf_pipeline() -> ProcessingPipeline:
                 identifier="ocsf_field_mappings_file_rename",
                 transformation=FieldMappingTransformation(
                     {
-                        "SourceFilename": "file.name",
-                        "TargetFilename": "file_result.file.name",
+                        "Image": "actor.process.file.path",
+                        "SourceFilename": "file.path",
+                        "TargetFilename": "file_result.path",
                     }
                 ),
                 rule_conditions=[LogsourceCondition(category="file_rename")],
@@ -365,17 +375,18 @@ def ocsf_pipeline() -> ProcessingPipeline:
                 identifier="ocsf_field_mappings_image_load",
                 transformation=FieldMappingTransformation(
                     {
-                        "Company": "Company",
-                        "Hashes": "process.file.hashes.value",
-                        "SignatureStatus": "SignatureStatus",
-                        "Signed": "Signed",
+                        "FileVersion": "module.file.version",
+                        "Company": "module.file.company_name",
+                        "Hashes": "module.file.hashes.value",
+                        "SignatureStatus": "module.file.signature.state",
+                        "Signed": "unmapped.Signed",
                         "CommandLine": "process.cmd_line",
-                        "Description": "Description",
-                        "OriginalFileName": "process.file.internal_name",
-                        "Image": "process.file.name",
-                        "Signature": "Signature",
-                        "Product": "Product",
-                        "ImageLoaded": "process.file.name",
+                        "Description": "module.file.desc",
+                        "OriginalFileName": "module.file.internal_name",
+                        "Image": "process.file.path",
+                        "Signature": "module.file.signature.certificate.subject",
+                        "Product": "module.file.product.name",
+                        "ImageLoaded": "module.file.path",
                     }
                 ),
                 rule_conditions=[LogsourceCondition(category="image_load")],
@@ -386,14 +397,17 @@ def ocsf_pipeline() -> ProcessingPipeline:
                 identifier="ocsf_field_mappings_network_connection",
                 transformation=FieldMappingTransformation(
                     {
+                        "Computer": "device.hostname",
+                        "DestinationIsIpv6": "unmapped.DestinationIsIpv6",
+                        "User": "actor.user.name",
                         "SourcePort": "src_endpoint.port",
                         "DestinationPort": "dst_endpoint.port",
-                        "ParentImage": "actor.process.parent_process.file.name",
+                        "ParentImage": "actor.process.parent_process.file.path",
                         "CommandLine": "actor.process.cmd_line",
                         "SourceHostname": "src_endpoint.hostname",
                         "DestinationHostname": "dst_endpoint.hostname",
                         "SourceIsIpv6": "unmapped.SourceIsIpv6",
-                        "Image": "actor.process.file.name",
+                        "Image": "actor.process.file.path",
                         "DestinationIp": "dst_endpoint.ip",
                         "SourceIp": "src_endpoint.ip",
                         "Initiated": "unmapped.Initiated",
@@ -420,12 +434,13 @@ def ocsf_pipeline() -> ProcessingPipeline:
                 identifier="ocsf_field_mappings_process_access",
                 transformation=FieldMappingTransformation(
                     {
-                        "SourceImage": "parent_process.name",
-                        "GrantedAccess": "GrantedAccess",
-                        "Provider_Name": "Provider_Name",
-                        "CallTrace": "CallTrace",
-                        "SourceUser": "SourceUser",
-                        "TargetImage": "process.name",
+                        "SourceCommandLine": "actor.process.cmd_line",
+                        "SourceImage": "actor.process.file.path",
+                        "GrantedAccess": "unmapped.GrantedAccess",
+                        "Provider_Name": "metadata.log_provider",
+                        "CallTrace": "unmapped.CallTrace",
+                        "SourceUser": "actor.user.name",
+                        "TargetImage": "process.file.path",
                     }
                 ),
                 rule_conditions=[LogsourceCondition(category="process_access")],
@@ -436,22 +451,23 @@ def ocsf_pipeline() -> ProcessingPipeline:
                 identifier="ocsf_field_mappings_process_creation",
                 transformation=FieldMappingTransformation(
                     {
-                        "Hashes": "Hashes",
-                        "User": "process.user.name",
+                        "GrandParentImage": "process.parent_process.parent_process.file.path",
+                        "Hashes": "process.file.hashes.value",
+                        "User": "actor.user.name",
                         "CommandLine": "process.cmd_line",
                         "ParentCommandLine": "process.parent_process.cmd_line",
-                        "Image": "process.name",
+                        "Image": "process.file.path",
                         "Description": "process.file.desc",
                         "LogonId": "process.session.uid",
                         "CurrentDirectory": "process.working_directory",
                         "OriginalFileName": "process.file.internal_name",
-                        "Provider_Name": "Provider_Name",
-                        "ParentUser": "ParentUser",
-                        "FileVersion": "FileVersion",
-                        "Company": "Company",
-                        "Product": "Product",
-                        "ParentImage": "process.parent_process.name",
-                        "IntegrityLevel": "IntegrityLevel",
+                        "Provider_Name": "metadata.log_provider",
+                        "ParentUser": "process.parent_process.user.name",
+                        "FileVersion": "process.file.version",
+                        "Company": "process.file.company_name",
+                        "Product": "process.file.product.name",
+                        "ParentImage": "process.parent_process.file.path",
+                        "IntegrityLevel": "process.integrity",
                     }
                 ),
                 rule_conditions=[LogsourceCondition(category="process_creation")],
@@ -462,8 +478,8 @@ def ocsf_pipeline() -> ProcessingPipeline:
                 identifier="ocsf_field_mappings_process_tampering",
                 transformation=FieldMappingTransformation(
                     {
-                        "Type": "Type",
-                        "Image": "process.name",
+                        "Type": "unmapped.Type",
+                        "Image": "process.file.path",
                     }
                 ),
                 rule_conditions=[LogsourceCondition(category="process_tampering")],
@@ -474,11 +490,23 @@ def ocsf_pipeline() -> ProcessingPipeline:
                 identifier="ocsf_field_mappings_process_termination",
                 transformation=FieldMappingTransformation(
                     {
-                        "Type": "Type",
-                        "Image": "process.name",
+                        "Type": "unmapped.Type",
+                        "Image": "process.file.path",
                     }
                 ),
                 rule_conditions=[LogsourceCondition(category="process_termination")],
+            )
+        ]
+        + [
+            ProcessingItem(  # c-uri-extension holds a bare extension, match it as URL path suffix
+                identifier="ocsf_value_proxy_c_uri_extension",
+                transformation=ReplaceStringTransformation(
+                    r"^\.?", "*.", interpret_special=True
+                ),
+                rule_conditions=[LogsourceCondition(category="proxy")],
+                field_name_conditions=[
+                    IncludeFieldCondition(fields=["c-uri-extension"])
+                ],
             )
         ]
         + [
@@ -486,15 +514,17 @@ def ocsf_pipeline() -> ProcessingPipeline:
                 identifier="ocsf_field_mappings_proxy",
                 transformation=FieldMappingTransformation(
                     {
-                        "c-useragent": "c-useragent",
-                        "dst_ip": "dst_ip",
-                        "cs-uri": "cs-uri",
-                        "cs-method": "cs-method",
-                        "c-uri-extension": "c-uri-extension",
-                        "cs-host": "cs-host",
-                        "c-uri": "c-uri",
-                        "cs-cookie": "cs-cookie",
-                        "c-uri-query": "c-uri-query",
+                        "cs-uri-stem": "http_request.url.path",
+                        "sc-status": "http_response.code",
+                        "c-useragent": "http_request.user_agent",
+                        "dst_ip": "dst_endpoint.ip",
+                        "cs-uri": "http_request.url.url_string",
+                        "cs-method": "http_request.http_method",
+                        "c-uri-extension": "http_request.url.path",
+                        "cs-host": "http_request.url.hostname",
+                        "c-uri": "http_request.url.url_string",
+                        "cs-cookie": "http_request.http_headers.value",
+                        "c-uri-query": "http_request.url.query_string",
                     }
                 ),
                 rule_conditions=[LogsourceCondition(category="proxy")],
@@ -529,8 +559,8 @@ def ocsf_pipeline() -> ProcessingPipeline:
                 identifier="ocsf_field_mappings_ps_module",
                 transformation=FieldMappingTransformation(
                     {
-                        "ContextInfo": "ContextInfo",
-                        "Payload": "Payload",
+                        "ContextInfo": "unmapped.context_info",
+                        "Payload": "script.script_content.value",
                     }
                 ),
                 rule_conditions=[LogsourceCondition(category="ps_module")],
@@ -541,8 +571,8 @@ def ocsf_pipeline() -> ProcessingPipeline:
                 identifier="ocsf_field_mappings_ps_script",
                 transformation=FieldMappingTransformation(
                     {
-                        "ScriptBlockText": "ScriptBlockText",
-                        "Path": "Path",
+                        "ScriptBlockText": "script.script_content.value",
+                        "Path": "script.file.path",
                     }
                 ),
                 rule_conditions=[LogsourceCondition(category="ps_script")],
@@ -554,7 +584,7 @@ def ocsf_pipeline() -> ProcessingPipeline:
                 transformation=FieldMappingTransformation(
                     {
                         "Device": "Device",
-                        "Image": "Image",
+                        "Image": "process.file.path",
                     }
                 ),
                 rule_conditions=[LogsourceCondition(category="raw_access_thread")],
@@ -565,9 +595,9 @@ def ocsf_pipeline() -> ProcessingPipeline:
                 identifier="ocsf_field_mappings_registry_add",
                 transformation=FieldMappingTransformation(
                     {
-                        "EventType": "EventType",
+                        "EventType": "unmapped.EventType",
                         "TargetObject": "reg_key.path",
-                        "Image": "reg_key.path",
+                        "Image": "actor.process.file.path",
                     }
                 ),
                 rule_conditions=[LogsourceCondition(category="registry_add")],
@@ -578,7 +608,7 @@ def ocsf_pipeline() -> ProcessingPipeline:
                 identifier="ocsf_field_mappings_registry_delete",
                 transformation=FieldMappingTransformation(
                     {
-                        "EventType": "EventType",
+                        "EventType": "unmapped.EventType",
                         "TargetObject": "reg_key.path",
                         "Image": "reg_key.path",
                     }
@@ -591,12 +621,12 @@ def ocsf_pipeline() -> ProcessingPipeline:
                 identifier="ocsf_field_mappings_registry_event",
                 transformation=FieldMappingTransformation(
                     {
-                        "NewName": "NewName",
+                        "NewName": "unmapped.NewName",
                         "TargetObject": "reg_key.path",
                         "Image": "reg_key.path",
-                        "EventType": "EventType",
+                        "EventType": "unmapped.EventType",
                         "EventID": "metadata.event_code",
-                        "Details": "Details",
+                        "Details": "unmapped.Details",
                     }
                 ),
                 rule_conditions=[LogsourceCondition(category="registry_event")],
@@ -607,7 +637,7 @@ def ocsf_pipeline() -> ProcessingPipeline:
                 identifier="ocsf_field_mappings_registry_rename",
                 transformation=FieldMappingTransformation(
                     {
-                        "EventType": "EventType",
+                        "EventType": "unmapped.EventType",
                         "TargetObject": "reg_key.path",
                         "Image": "reg_key.path",
                     }
@@ -620,11 +650,11 @@ def ocsf_pipeline() -> ProcessingPipeline:
                 identifier="ocsf_field_mappings_registry_set",
                 transformation=FieldMappingTransformation(
                     {
-                        "User": "User",
-                        "TargetObject": "reg_key.path",
+                        "User": "actor.user.name",
+                        "TargetObject": "reg_value.path",
+                        "EventType": "unmapped.EventType",
+                        "Details": "reg_value.data",
                         "Image": "reg_key.path",
-                        "EventType": "EventType",
-                        "Details": "Details",
                     }
                 ),
                 rule_conditions=[LogsourceCondition(category="registry_set")],
@@ -657,11 +687,15 @@ def ocsf_pipeline() -> ProcessingPipeline:
                 identifier="ocsf_field_mappings_webserver",
                 transformation=FieldMappingTransformation(
                     {
-                        "cs-uri-query": "cs-uri-query",
-                        "cs-method": "cs-method",
-                        "sc-status": "sc-status",
-                        "cs-user-agent": "cs-user-agent",
-                        "cs-referer": "cs-referer",
+                        "cs-uri-query": "http_request.url.query_string",
+                        "cs-method": "http_request.http_method",
+                        "sc-status": "http_response.code",
+                        "cs-user-agent": "http_request.user_agent",
+                        "cs-referer": "http_request.referrer",
+                        "cs-uri-stem": "http_request.url.path",
+                        "cs-host": "http_request.url.hostname",
+                        "cs-username": "actor.user.name",
+                        "cs-content-type": "http_request.http_headers.value",
                     }
                 ),
                 rule_conditions=[LogsourceCondition(category="webserver")],
@@ -684,6 +718,8 @@ def ocsf_pipeline() -> ProcessingPipeline:
                 identifier="ocsf_field_mappings_windows_security",
                 transformation=FieldMappingTransformation(
                     {
+                        "ParentProcessId": "unmapped.ParentProcessId",
+                        "ClientProcessId": "unmapped.ClientProcessId",
                         "AccessList": "AccessList",
                         "AccessMask": "AccessMask",
                         "AllowedToDelegateTo": "AllowedToDelegateTo",
@@ -694,15 +730,15 @@ def ocsf_pipeline() -> ProcessingPipeline:
                         "AuditSourceName": "AuditSourceName",
                         "AuthenticationPackageName": "AuthenticationPackageName",
                         "CertThumbprint": "CertThumbprint",
-                        "DestAddress": "DestAddress",
+                        "DestAddress": "dst_endpoint.ip",
                         "Destination": "Destination",
-                        "DestPort": "DestPort",
+                        "DestPort": "dst_endpoint.port",
                         "EventID": "metadata.event_code",
                         "FilterName": "FilterName",
                         "FilterOrigin": "FilterOrigin",
                         "ImpersonationLevel": "ImpersonationLevel",
                         "IpAddress": "src_endpoint.ip",
-                        "IpPort": "IpPort",
+                        "IpPort": "src_endpoint.port",
                         "KeyLength": "KeyLength",
                         "Keywords": "Keywords",
                         "LayerRTID": "LayerRTID",
@@ -722,7 +758,7 @@ def ocsf_pipeline() -> ProcessingPipeline:
                         "PrivilegeList": "PrivilegeList",
                         "ProcessName": "ProcessName",
                         "Properties": "Properties",
-                        "Provider_Name": "unmapped.SourceName",
+                        "Provider_Name": "metadata.log_provider",
                         "ProviderContextName": "ProviderContextName",
                         "RelativeTargetName": "RelativeTargetName",
                         "SamAccountName": "SamAccountName",
@@ -730,12 +766,12 @@ def ocsf_pipeline() -> ProcessingPipeline:
                         "ServiceFileName": "win_service.cmd_line",
                         "ServiceName": "win_service.name",
                         "ServicePrincipalNames": "ServicePrincipalNames",
-                        "ServiceStartType": "ServiceStartType",
-                        "ServiceType": "ServiceType",
+                        "ServiceStartType": "unmapped.ServiceStartType",
+                        "ServiceType": "unmapped.ServiceType",
                         "ShareName": "ShareName",
                         "SidHistory": "SidHistory",
-                        "SourceAddress": "SourceAddress",
-                        "SourcePort": "SourcePort",
+                        "SourceAddress": "src_endpoint.ip",
+                        "SourcePort": "src_endpoint.port",
                         "Status": "Status",
                         "SubcategoryGuid": "SubcategoryGuid",
                         "SubjectDomainName": "SubjectDomainName",
@@ -765,7 +801,7 @@ def ocsf_pipeline() -> ProcessingPipeline:
         ]
         + [
             ProcessingItem(  # Field mappings for windows system, eventid 7045)
-                identifier="ocsf_field_mappings_windows_system",
+                identifier="ocsf_field_mappings_windows_system_7045",
                 transformation=FieldMappingTransformation(
                     {
                         "EventID": "metadata.event_code",
@@ -813,7 +849,7 @@ def ocsf_pipeline() -> ProcessingPipeline:
         ]
         + [
             ProcessingItem(  # Field mappings for windows system)
-                identifier="ocsf_field_mappings_windows_system",
+                identifier="ocsf_field_mappings_windows_system_psscript",
                 transformation=FieldMappingTransformation(
                     {
                         "ScriptBlockText": "script.script_content",
@@ -827,7 +863,7 @@ def ocsf_pipeline() -> ProcessingPipeline:
         ]
         + [
             ProcessingItem(  # Field mappings for windows system)
-                identifier="ocsf_field_mappings_windows_system",
+                identifier="ocsf_field_mappings_windows_system_psmodule",
                 transformation=FieldMappingTransformation(
                     {
                         "Payload": "script.script_content",
